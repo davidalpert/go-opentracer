@@ -1,5 +1,6 @@
-#PROJECTNAME=$(shell basename "$(PWD)")
-PROJECTNAME="gopentracer"
+# project name
+#PROJECT_NAME=$(shell basename "$(PWD)")
+PROJECT_NAME=gopentracer
 
 # version of go tooling to use === must match version in go.mod ===
 GO=go1.16
@@ -9,9 +10,6 @@ MAKEFLAGS += --silent
 
 # CGO?
 CGO=0
-
-# project name
-PROJECT_NAME=gopentracer
 
 # project version
 VERSION=$(shell cat VERSION)
@@ -51,7 +49,8 @@ ship:
 	mkdir -p bin
 	@CGO_ENABLED=$(CGO) GOOS=linux GOARCH=amd64 $(GO) build -o bin/linux-amd64/$(PROJECT_NAME) ./main.go
 	@echo "Copying $(PROJECT_NAME) $(VERSION) into the container"
-	docker cp "$(HOME)/dev/personal/go-opentracer/bin/linux-amd64/$(PROJECTNAME)" "$(shell docker ps | grep otel | awk '{print $$1}'):/$(PROJECTNAME)"
+	docker cp "$(HOME)/dev/personal/go-opentracer/bin/linux-amd64/$(PROJECT_NAME)" "$(shell docker ps | grep otel | awk '{print $$1}'):/$(PROJECT_NAME)"
+	#docker cp "$(HOME)/dev/personal/go-opentracer/bin/linux-amd64/$(PROJECT_NAME)" "$(shell docker ps | grep default-centos-7 | awk '{print $$1}'):/$(PROJECT_NAME)"
 
 rebuild: clean build ## rebuild
 
@@ -64,7 +63,7 @@ test-verbose: ./internal/version/detail.go ## run all tests (with verbose flag)
 .PHONY: help
 help: Makefile
 	@echo
-	@echo " $(PROJECTNAME) $(VERSION) - available targets:"
+	@echo " $(PROJECT_NAME) $(VERSION) - available targets:"
 	@echo
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo
