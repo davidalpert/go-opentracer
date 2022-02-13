@@ -10,6 +10,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.4.0
 	go.opentelemetry.io/otel/sdk v1.4.0
 	go.opentelemetry.io/otel/trace v1.4.0
+	gopkg.in/DataDog/dd-trace-go.v1 v1.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

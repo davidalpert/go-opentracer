@@ -1,6 +1,6 @@
 package main
 
-//go:generate go run ./version_gen.go gopentracer
+//go:generate go run ./version_gen.go ddtracer
 
 import (
 	_ "embed"
