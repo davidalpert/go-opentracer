@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/davidalpert/gopentracer/internal/datadog"
+	"github.com/davidalpert/gopentracer/internal/types"
 	"github.com/davidalpert/gopentracer/internal/utils"
 	"github.com/davidalpert/gopentracer/internal/version"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -18,6 +20,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -74,53 +77,6 @@ func (o *RunOptions) Complete(cmd *cobra.Command, args []string) error {
 	o.Command = args[0]
 	return nil
 }
-
-//
-//func rawTagToKeyValue(spanCtx trace.SpanContext, s string) (attribute.KeyValue, error) {
-//	parts := strings.Split(s, ":")
-//	if len(parts) == 2 {
-//		// value without type, default to string
-//		parts = append(parts, "string")
-//	}
-//	if len(parts) < 3 {
-//		return attribute.KeyValue{}, fmt.Errorf("must specify key:value (or optionally key:value:type): '%s'", s)
-//	}
-//
-//	key := parts[0]
-//	val := injectTraceAndSpanID(spanCtx, parts[1])
-//	valType := parts[2]
-//
-//	var attrType types.OpenTelemetryAttributeType
-//	err := attrType.UnmarshalJSON([]byte("\"" + valType + "\""))
-//	if err != nil {
-//		return attribute.KeyValue{}, err
-//	}
-//
-//	switch attrType {
-//	case types.StringAttribute:
-//		return attribute.String(key, val), nil
-//	case types.BoolAttribute:
-//		if v, err := strconv.ParseBool(val); err != nil {
-//			return attribute.String(key, val), nil
-//		} else {
-//			return attribute.Bool(key, v), nil
-//		}
-//	case types.IntAttribute, types.Int32Attribute:
-//		if v, err := strconv.ParseInt(val, 10, 32); err != nil {
-//			return attribute.String(key, val), nil
-//		} else {
-//			return attribute.Int(key, int(v)), nil
-//		}
-//	case types.Int64Attribute:
-//		if v, err := strconv.ParseInt(val, 10, 64); err != nil {
-//			return attribute.String(key, val), nil
-//		} else {
-//			return attribute.Int64(key, v), nil
-//		}
-//	default:
-//		panic("should never get here")
-//	}
-//}
 
 // Validate validates the RunOptions
 func (o *RunOptions) Validate() error {
@@ -214,14 +170,13 @@ func (o *RunOptions) Run() error {
 	defer span.End()
 	cmdCtx := trace.ContextWithSpan(context.TODO(), span)
 
-	//spanAttrs := make([]attribute.KeyValue, len(o.SpanTagsRaw))
-	//for i, s := range o.SpanTagsRaw {
-	//	if a, err := rawTagToKeyValue(span.SpanContext(), s); err != nil {
-	//		return err
-	//	} else {
-	//		spanAttrs[i] = a
-	//	}
-	//}
+	for _, s := range o.SpanTagsRaw {
+		if a, err := rawTagToTypedAttribute(cmdCtx, s); err != nil {
+			return err
+		} else {
+			span.SetAttributes(a)
+		}
+	}
 
 	cmdText := injectTraceAndSpanID(cmdCtx, o.Command)
 	cmdParts := strings.Split(cmdText, " ")
@@ -283,4 +238,50 @@ func appendTraceAndSpanIDToEnv(ctx context.Context, ss []string) []string {
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_SPAN_ID=$DD_SPAN_ID"))
 	ss = append(ss, fmt.Sprintf("GOPENTRACER_VERSION=%s", version.Summary.Version))
 	return ss
+}
+
+func rawTagToTypedAttribute(ctx context.Context, s string) (attribute.KeyValue, error) {
+	parts := strings.Split(s, ":")
+	if len(parts) == 2 {
+		// value without type, default to string
+		parts = append(parts, "string")
+	}
+	if len(parts) < 3 {
+		return attribute.KeyValue{}, fmt.Errorf("must specify key:value (or optionally key:value:type): '%s'", s)
+	}
+
+	key := parts[0]
+	val := injectTraceAndSpanID(ctx, parts[1])
+	valType := parts[2]
+
+	var attrType types.OpenTelemetryAttributeType
+	err := attrType.UnmarshalJSON([]byte("\"" + valType + "\""))
+	if err != nil {
+		return attribute.KeyValue{}, err
+	}
+
+	switch attrType {
+	case types.StringAttribute:
+		return attribute.String(key, val), nil
+	case types.BoolAttribute:
+		if v, err := strconv.ParseBool(val); err != nil {
+			return attribute.String(key, val), nil
+		} else {
+			return attribute.Bool(key, v), nil
+		}
+	case types.IntAttribute, types.Int32Attribute:
+		if v, err := strconv.ParseInt(val, 10, 32); err != nil {
+			return attribute.String(key, val), nil
+		} else {
+			return attribute.Int(key, int(v)), nil
+		}
+	case types.Int64Attribute:
+		if v, err := strconv.ParseInt(val, 10, 64); err != nil {
+			return attribute.String(key, val), nil
+		} else {
+			return attribute.Int64(key, v), nil
+		}
+	default:
+		panic("should never get here")
+	}
 }
