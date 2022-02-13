@@ -22,6 +22,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // RunOptions is a struct to support version command
@@ -32,6 +33,7 @@ type RunOptions struct {
 	SpanTagsRaw           []string
 	TraceOLTPHttpEndpoint string
 	TraceLogFile          string
+	SpanDelay             time.Duration
 	VersionSummary        version.SummaryStruct
 }
 
@@ -69,6 +71,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&o.TraceOLTPHttpEndpoint, "trace-http-endpoint", "", "sent traces over http to this endpoint")
 	cmd.Flags().StringVar(&o.TraceLogFile, "trace-log-file", "", "log traces to this file")
 	cmd.Flags().StringSliceVar(&o.SpanTagsRaw, "tag", make([]string, 0), "tags in the format key:val[:type]")
+	cmd.Flags().DurationVar(&o.SpanDelay, "span-delay", 100*time.Millisecond, "how long to wait after the command completes before completing the span (golang time.Duration)")
 	return cmd
 }
 
@@ -159,7 +162,7 @@ func (o *RunOptions) Run() error {
 	tp := sdktrace.NewTracerProvider(traceProviderOptions...)
 	defer func() {
 		if err := tp.Shutdown(context.Background()); err != nil {
-			//panic(err)
+			panic(err)
 		}
 	}()
 	otel.SetTracerProvider(tp)
@@ -193,6 +196,9 @@ func (o *RunOptions) Run() error {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 	}
+
+	time.Sleep(o.SpanDelay)
+
 	return err
 }
 
