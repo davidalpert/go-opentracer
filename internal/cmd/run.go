@@ -182,14 +182,17 @@ func (o *RunOptions) Run() error {
 	}
 
 	cmdText := injectTraceAndSpanID(cmdCtx, o.Command)
+	//cmdText = os.ExpandEnv(cmdText) // TODO: review as this may create unpredictable behavior
 	cmdParts := strings.Split(cmdText, " ")
 	c := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
 	c.Stdout = os.Stdout
 	c.Stdin = os.Stdin
 	c.Stderr = os.Stderr
+	c.Env = make([]string, len(os.Environ()))
+	for i, e := range os.Environ() {
+		c.Env[i] = e
+	}
 	c.Env = appendTraceAndSpanIDToEnv(ctx, c.Env)
-
-	//fmt.Printf("path: %s\nargs: %#v\nenv: %#v\ntags: %#v\n", c.Path, c.Args, c.Env, spanAttrs)
 
 	err := c.Run()
 	if err != nil {
