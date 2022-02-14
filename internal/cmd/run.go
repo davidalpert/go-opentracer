@@ -31,6 +31,7 @@ type RunOptions struct {
 	utils.PrinterOptions
 	Command               string
 	DeploymentEnvironment string
+	SpanName              string
 	SpanTagsRaw           []string
 	TraceOLTPHttpEndpoint string
 	TraceLogFile          string
@@ -73,6 +74,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&o.TraceLogFile, "trace-log-file", "", "log traces to this file")
 	cmd.Flags().StringSliceVar(&o.SpanTagsRaw, "tag", make([]string, 0), "tags in the format key:val[:type]")
 	cmd.Flags().DurationVar(&o.SpanDelay, "span-delay", 100*time.Millisecond, "how long to wait after the command completes before completing the span (golang time.Duration)")
+	cmd.Flags().StringVar(&o.SpanName, "span-name", "Run", "name for this span")
 	return cmd
 }
 
@@ -86,6 +88,9 @@ func (o *RunOptions) Complete(cmd *cobra.Command, args []string) error {
 func (o *RunOptions) Validate() error {
 	if o.Command == "" {
 		return fmt.Errorf("command is required")
+	}
+	if o.SpanName == "" {
+		return fmt.Errorf("span-name is required")
 	}
 	return o.PrinterOptions.Validate()
 }
@@ -170,7 +175,7 @@ func (o *RunOptions) Run() error {
 
 	ctx, span := otel.Tracer(o.VersionSummary.AppName,
 		trace.WithInstrumentationVersion(o.VersionSummary.Version),
-	).Start(context.TODO(), "Run")
+	).Start(context.TODO(), o.SpanName)
 	defer span.End()
 	cmdCtx := trace.ContextWithSpan(context.TODO(), span)
 
