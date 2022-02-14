@@ -12,7 +12,7 @@ MAKEFLAGS += --silent
 CGO=0
 
 # project version
-VERSION=$(shell cat VERSION)
+VERSION=$(shell sbot get version)
 
 # ---------------------- targets -------------------------------------
 
@@ -28,7 +28,7 @@ clean:
 tidy: ## runs 'go mod tidy' with the current versioned go command
 	$(GO) mod tidy
 
-./internal/version/detail.go: VERSION
+./internal/version/detail.go:
 	$(MAKE) gen
 
 .PHONY: gen

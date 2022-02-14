@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 // This program generates version.go. It can be invoked by running invoking go:generate
@@ -13,13 +14,15 @@ import (
 	"time"
 )
 
-//go:embed VERSION
-var versionStem string
-
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("usage: go run version_gen.go <appName>")
 		os.Exit(1)
+	}
+
+	versionStem, err := exec.Command("sbot", "get", "version").Output()
+	if err != nil {
+		panic(err)
 	}
 
 	gitBranch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
@@ -75,7 +78,7 @@ func main() {
 		Timestamp    time.Time
 	}{
 		AppName:      os.Args[1],
-		Version:      strings.Trim(versionStem, "\r\n"),
+		Version:      strings.Trim(string(versionStem), "\r\n"),
 		Branch:       strings.Trim(string(gitBranch), "\r\n"),
 		SHA:          strings.Trim(string(gitSHA), "\r\n"),
 		HasStaged:    hasStaged,
@@ -100,18 +103,18 @@ import (
 
 // SummaryStruct provides an easy way to grab all the govvv version details together
 type SummaryStruct struct {
-	AppName              string `+"`json:\"app_name\"`"+`
-	BuildDate            string `+"`json:\"build_date\"`"+`
-	GitBranch            string `+"`json:\"branch\"`"+`
-	GitCommit            string `+"`json:\"commit\"`"+`
-	GitDirty             bool `+"`json:\"dirty\"`"+`
-	GitDirtyHasModified  bool `+"`json:\"dirty_modified\"`"+`
-	GitDirtyHasStaged    bool `+"`json:\"dirty_staged\"`"+`
-	GitDirtyHasUntracked bool `+"`json:\"dirty_untracked\"`"+`
-	GitWorkingState      string `+"`json:\"working_state\"`"+`
-	GitSummary           string `+"`json:\"summary\"`"+`
-	UserAgentString      string `+"`json:\"user_agent\"`"+`
-	Version              string `+"`json:\"version\"`"+`
+	AppName              string ` + "`json:\"app_name\"`" + `
+	BuildDate            string ` + "`json:\"build_date\"`" + `
+	GitBranch            string ` + "`json:\"branch\"`" + `
+	GitCommit            string ` + "`json:\"commit\"`" + `
+	GitDirty             bool ` + "`json:\"dirty\"`" + `
+	GitDirtyHasModified  bool ` + "`json:\"dirty_modified\"`" + `
+	GitDirtyHasStaged    bool ` + "`json:\"dirty_staged\"`" + `
+	GitDirtyHasUntracked bool ` + "`json:\"dirty_untracked\"`" + `
+	GitWorkingState      string ` + "`json:\"working_state\"`" + `
+	GitSummary           string ` + "`json:\"summary\"`" + `
+	UserAgentString      string ` + "`json:\"user_agent\"`" + `
+	Version              string ` + "`json:\"version\"`" + `
 }
 
 // NewVersionSummary builds a new version SummaryStruct
