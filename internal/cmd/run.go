@@ -96,6 +96,9 @@ func (o *RunOptions) Validate() error {
 	if o.SpanName == "" {
 		return fmt.Errorf("span-name is required")
 	}
+	if o.TraceLogFile == "" && o.TraceOLTPHttpEndpoint == "" {
+		return fmt.Errorf("at least one of --trace-log-file and --trace-http-endpoint must be set")
+	}
 	return o.PrinterOptions.Validate()
 }
 
