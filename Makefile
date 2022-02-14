@@ -46,6 +46,13 @@ build: ./internal/version/detail.go ## build
 	mkdir -p bin
 	@CGO_ENABLED=$(CGO) $(GO) build -o bin/$(PROJECT_NAME) ./main.go
 
+xbuild: ./internal/version/detail.go ## xbuild
+	@echo "Building $(PROJECT_NAME) $(VERSION)"
+	mkdir -p bin
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=$(CGO) $(GO) build -o bin/linux-amd64/$(PROJECT_NAME) ./main.go
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=$(CGO) $(GO) build -o bin/darwin-amd64/$(PROJECT_NAME) ./main.go
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=$(CGO) $(GO) build -o bin/darwin-arm64/$(PROJECT_NAME) ./main.go
+
 ship:
 	@echo "Building $(PROJECT_NAME) $(VERSION) for linux/amd64"
 	mkdir -p bin
