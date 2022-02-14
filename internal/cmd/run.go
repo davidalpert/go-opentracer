@@ -31,6 +31,8 @@ type RunOptions struct {
 	utils.PrinterOptions
 	Command               string
 	DeploymentEnvironment string
+	ServiceName           string
+	ServiceVersion        string
 	SpanName              string
 	SpanTagsRaw           []string
 	TraceOLTPHttpEndpoint string
@@ -75,6 +77,8 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringSliceVar(&o.SpanTagsRaw, "tag", make([]string, 0), "tags in the format key:val[:type]")
 	cmd.Flags().DurationVar(&o.SpanDelay, "span-delay", 100*time.Millisecond, "how long to wait after the command completes before completing the span (golang time.Duration)")
 	cmd.Flags().StringVar(&o.SpanName, "span-name", "Run", "name for this span")
+	cmd.Flags().StringVar(&o.ServiceName, "service", o.VersionSummary.AppName, "value for this span's service tag")
+	cmd.Flags().StringVar(&o.ServiceVersion, "service-version", o.VersionSummary.Version, "value for this span's service version tag")
 	return cmd
 }
 
@@ -132,8 +136,8 @@ func (o *RunOptions) newTracerResource() *resource.Resource {
 		resource.Default(),
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(o.VersionSummary.AppName),
-			semconv.ServiceVersionKey.String(o.VersionSummary.Version),
+			semconv.ServiceNameKey.String(o.ServiceName),
+			semconv.ServiceVersionKey.String(o.ServiceVersion),
 			semconv.DeploymentEnvironmentKey.String(o.DeploymentEnvironment),
 		),
 	)
