@@ -39,6 +39,8 @@ run: ./internal/version/detail.go ## run direct from source
 	#@echo "Running $(PROJECT_NAME) $(VERSION)"
 	@CGO_ENABLED=$(CGO) $(GO) run ./main.go $(filter-out $@,$(MAKECMDGOALS))
 
+rebuild: clean build ## rebuild
+
 build: ./internal/version/detail.go ## build
 	@echo "Building $(PROJECT_NAME) $(VERSION)"
 	mkdir -p bin
