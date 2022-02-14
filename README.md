@@ -71,7 +71,29 @@ To get a local copy up and running follow these simple steps.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Run the `opentracer` binary with no arguments to get help text.
+Invoke a shell command inside an OpenTelemetry Span and send the trace context downstream to an OpenTelemetry-instrumented service:
+```sh
+./opentracer --tag c:false -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H traceparent:$TRACEPARENT_HEADER_VALUE-$PARENT_ID-$TRACE_FLAGS https://your.opentelemetry-instrumented.service.com/info'
+```
+
+
+Features:
+- `opentracer` performs token replacement on the command text before executing it so the supported tokens can be used to make use of the trace context;
+- `opentracer` adds the same tokens as env variables so any script run inside the command should also be able to reference the trace context;
+- you can override the `deployment.environment` value (e.g. `--deployment-environment dev`)
+- you can add arbitrary tags of the format `--tag key:value` and they will be added to the wrapping span as string values;
+- you can add typed spans by optionally specifying one of the supported types `--tag key:value:type` (e.g. `--tag is_registered:true:bool`)
+- you can send traces to any OpenTelemetry configured with an OTLP HTTP endpoint using `--trace-http-endpoint`
+
+If you want more fine-grained control over the `traceparent` header (which conforms to the W3C [trace-context](https://w3c.github.io/trace-context/) spec) the individual pieces are also available:
+```sh
+./opentracer --tag c:false -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H traceparent:00-$TRACE_ID-$SPAN_ID-00 https://your.opentelemetry-instrumented.service.com/info'
+```
+
+Datadog uses a proprietary format for trace and parent IDs; if you want to propagate trace context to a datadog-instrumented service appropriately formatted DD_TRACE_ID and DD_SPAN_ID tokens also available:
+```sh
+./opentracer --tag c:134:int -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H X-DATADOG-TRACE-ID:$DD_TRACE_ID -H X-DATADOG-PARENT-ID:$DD_SPAN_ID https://your.datadog-instrumented.service.com/info'
+```
 
 ### Utility Commands
 
@@ -94,7 +116,6 @@ Flags:
   -h, --help   help for gopentracer
 
 Use "gopentracer [command] --help" for more information about a command.
-
 ```
 
 <!-- ROADMAP -->
