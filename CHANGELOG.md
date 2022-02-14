@@ -28,6 +28,17 @@
 ## Changelog
 
 
+<a name="v1.1.0"></a>
+### [v1.1.0] - 2022-02-13
+#### Build
+- read version from sbot
+#### Chore
+- ignore a .local scratch folder
+#### Feat
+- ensure that at least one valid exporter is configured
+- **tags:** allow overriding the service name and version
+- **tags:** allow overriding the span name
+
 <a name="v1.0.0"></a>
 ### [v1.0.0] - 2022-02-13
 #### Build
@@ -36,6 +47,8 @@
 - auto-generate change logs
 #### Doc
 - add usage examples
+#### Docs
+- release notes for v1.0.0
 #### Feat
 - ensure that the command runs inside the outer shell environment
 - **datadog:** simplify run command and integrate datadog ID adapters
@@ -48,5 +61,6 @@
 #### Feat
 - **run:** add initial spike of a tracer
 
-[Unreleased]: https://github.com/davidalpert/go-opentracer/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/davidalpert/go-opentracer/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/davidalpert/go-opentracer/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/davidalpert/go-opentracer/compare/v0.0.1...v1.0.0
