@@ -46,7 +46,7 @@ build: ./internal/version/detail.go ## build
 	mkdir -p bin
 	@CGO_ENABLED=$(CGO) $(GO) build -o bin/$(PROJECT_NAME) ./main.go
 
-xbuild: ./internal/version/detail.go ## xbuild
+xbuild: gen ## xbuild
 	@echo "Building $(PROJECT_NAME) $(VERSION)"
 	mkdir -p bin
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=$(CGO) $(GO) build -o bin/linux-amd64/$(PROJECT_NAME) ./main.go
