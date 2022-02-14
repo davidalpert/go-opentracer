@@ -29,16 +29,17 @@
   <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
 
 - [About The Project](#about-the-project)
-    - [Built With](#built-with)
+  - [Built With](#built-with)
 - [Getting Started](#getting-started)
-    - [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
 - [Usage](#usage)
-    - [Utility Commands](#utility-commands)
+  - [Supported Replacement Tokens](#supported-replacement-tokens)
+  - [Utility Commands](#utility-commands)
 - [Roadmap](#roadmap)
 - [Local Development](#local-development)
-    - [Prerequisites](#prerequisites)
-    - [Make targets](#make-targets)
-    - [Rapid Development](#rapid-development)
+  - [Prerequisites](#prerequisites-1)
+  - [Make targets](#make-targets)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -73,9 +74,8 @@ To get a local copy up and running follow these simple steps.
 
 Invoke a shell command inside an OpenTelemetry Span and send the trace context downstream to an OpenTelemetry-instrumented service:
 ```sh
-./opentracer --tag c:false -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H traceparent:$TRACEPARENT_HEADER_VALUE-$PARENT_ID-$TRACE_FLAGS https://your.opentelemetry-instrumented.service.com/info'
+./opentracer --tag c:false -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H traceparent:$W3CTRACEPARENT https://your.opentelemetry-instrumented.service.com/info'
 ```
-
 
 Features:
 - `opentracer` performs token replacement on the command text before executing it so the supported tokens can be used to make use of the trace context;
@@ -94,6 +94,16 @@ Datadog uses a proprietary format for trace and parent IDs; if you want to propa
 ```sh
 ./opentracer --tag c:134:int -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H X-DATADOG-TRACE-ID:$DD_TRACE_ID -H X-DATADOG-PARENT-ID:$DD_SPAN_ID https://your.datadog-instrumented.service.com/info'
 ```
+
+### Supported Replacement Tokens
+
+| Token            | Description                                                                                                                | Example                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `TRACE_ID`       | An OpenTelemetry-formatted 128-bit hexidecimal value for the TraceID created to wrap any Spans downstream of this command. | `4bf92f3577b34da6a3ce929d0e0e4736`                        |
+| `SPAN_ID`        | An OpenTelemetry-formatted 64-bit hexidecimal value for the SpanID representing the run command.                           | `00f067aa0ba902b7`                                        |
+| `W3CTRACEPARENT` | The trace context for this span formatted according to the W3C [trace-context](https://w3c.github.io/trace-context/)       | `00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01` |
+| `DD_TRACE_ID`    | `TRACE_ID` formatted as a 64-bit unsigned integer<br/>to conform to Datadog's `X-DATADOG-TRACE-ID` HTTP header             | `9856658736241331422`                                     |
+| `DD_SPAN_ID`     | `SPAN_ID` formatted as a 64-bit unsigned integer<br/>to conform to Datadog's `X-DATADOG-PARENT-ID` HTTP header             | `1930319880373503199`                                     |
 
 ### Utility Commands
 

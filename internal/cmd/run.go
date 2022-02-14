@@ -7,6 +7,7 @@ import (
 	"github.com/davidalpert/gopentracer/internal/types"
 	"github.com/davidalpert/gopentracer/internal/utils"
 	"github.com/davidalpert/gopentracer/internal/version"
+	"github.com/davidalpert/gopentracer/internal/w3c"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -229,6 +230,9 @@ func injectTraceAndSpanID(ctx context.Context, s string) string {
 	s = strings.Replace(s, "$SPAN_ID", spanCtx.SpanID().String(), -1)
 	s = strings.Replace(s, "${SPAN_ID}", spanCtx.SpanID().String(), -1)
 
+	s = strings.Replace(s, "$PARENT_ID", spanCtx.SpanID().String(), -1)
+	s = strings.Replace(s, "${PARENT_ID}", spanCtx.SpanID().String(), -1)
+
 	ddTraceID := fmt.Sprintf("%d", datadog.DecodeAPMTraceID(spanCtx.TraceID()))
 	s = strings.Replace(s, "$DD_TRACE_ID", ddTraceID, -1)
 	s = strings.Replace(s, "${DD_TRACE_ID}", ddTraceID, -1)
@@ -236,6 +240,13 @@ func injectTraceAndSpanID(ctx context.Context, s string) string {
 	ddSpanID := fmt.Sprintf("%d", datadog.DecodeAPMSpanID(spanCtx.SpanID()))
 	s = strings.Replace(s, "$DD_SPAN_ID", ddSpanID, -1)
 	s = strings.Replace(s, "${DD_SPAN_ID}", ddSpanID, -1)
+
+	s = strings.Replace(s, "$DD_PARENT_ID", ddSpanID, -1)
+	s = strings.Replace(s, "${DD_PARENT_ID}", ddSpanID, -1)
+
+	traceparentValue := w3c.NewTraceParentFromSpanContext(spanCtx).String()
+	s = strings.Replace(s, "$W3CTRACEPARENT", traceparentValue, -1)
+	s = strings.Replace(s, "${W3CTRACEPARENT}", traceparentValue, -1)
 
 	return s
 }
@@ -245,6 +256,7 @@ func appendTraceAndSpanIDToEnv(ctx context.Context, ss []string) []string {
 	ss = append(ss, injectTraceAndSpanID(ctx, "SPAN_ID=$SPAN_ID"))
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_TRACE_ID=$DD_TRACE_ID"))
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_SPAN_ID=$DD_SPAN_ID"))
+	ss = append(ss, injectTraceAndSpanID(ctx, "W3CTRACEPARENT=$W3CTRACEPARENT"))
 	ss = append(ss, fmt.Sprintf("GOPENTRACER_VERSION=%s", version.Summary.Version))
 	return ss
 }
