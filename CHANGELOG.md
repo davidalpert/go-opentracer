@@ -28,12 +28,21 @@
 ## Changelog
 
 
+<a name="v1.1.1"></a>
+### [v1.1.1] - 2022-02-14
+#### Build
+- ensure that the version file is up-to-date during a cross build
+#### Fix
+- set error on span when run command has non-zero exit code
+
 <a name="v1.1.0"></a>
 ### [v1.1.0] - 2022-02-13
 #### Build
 - read version from sbot
 #### Chore
 - ignore a .local scratch folder
+#### Docs
+- release notes for v1.1.0
 #### Feat
 - ensure that at least one valid exporter is configured
 - **tags:** allow overriding the service name and version
@@ -61,6 +70,7 @@
 #### Feat
 - **run:** add initial spike of a tracer
 
-[Unreleased]: https://github.com/davidalpert/go-opentracer/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/davidalpert/go-opentracer/compare/v1.1.1...HEAD
+[v1.1.1]: https://github.com/davidalpert/go-opentracer/compare/v1.1.0...v1.1.1
 [v1.1.0]: https://github.com/davidalpert/go-opentracer/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/davidalpert/go-opentracer/compare/v0.0.1...v1.0.0
