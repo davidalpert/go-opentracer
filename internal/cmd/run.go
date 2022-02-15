@@ -211,6 +211,10 @@ func (o *RunOptions) Run() error {
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+	} else if c.ProcessState != nil && c.ProcessState.ExitCode() != 0 {
+		err = fmt.Errorf("run command exited with error: %d", c.ProcessState.ExitCode())
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 	}
 
 	time.Sleep(o.SpanDelay)
