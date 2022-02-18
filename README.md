@@ -43,7 +43,6 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
-- [Acknowledgements](#acknowledgements)
 
 </details>
 
@@ -215,12 +214,6 @@ Distributed under the GPU v3 License. See [LICENSE](LICENSE) for more informatio
 David Alpert - [@davidalpert](https://twitter.com/davidalpert)
 
 Project Link: [https://github.com/davidalpert/go-opentracer](https://github.com/davidalpert/go-opentracer)
-
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
-
-* [David Fowler](https://github.com/davidfowl) and [Phillip Seith](https://github.com/philippseith) for the [GoLang implementation](https://github.com/philippseith/signalr) of the server-side SignalR protocol
-* [Aaron Lindsay](https://github.com/aclindsa) for [ofxgo](https://github.com/aclindsa/ofxgo) (an OFX parsing library)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
