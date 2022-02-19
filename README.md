@@ -79,7 +79,8 @@ Invoke a shell command inside an OpenTelemetry Span and send the trace context d
 Features:
 - `opentracer` performs token replacement on the command text before executing it so the supported tokens can be used to make use of the trace context;
 - `opentracer` adds the same tokens as env variables so any script run inside the command should also be able to reference the trace context;
-- you can override the `deployment.environment` value (e.g. `--deployment-environment dev`)
+- `opentracer` can create nested spans; if you use `opentracer` to run a command or script which includes another call to `opentracer` the inner span will detect the outer trace context and nest inside the parent span;
+- you can override the `deployment.environment` value (e.g. `--deployment-environment dev` or `-e dev`)
 - you can add arbitrary tags of the format `--tag key:value` and they will be added to the wrapping span as string values;
 - you can add typed spans by optionally specifying one of the supported types `--tag key:value:type` (e.g. `--tag is_registered:true:bool`)
 - you can send traces to any OpenTelemetry configured with an OTLP HTTP endpoint using `--trace-http-endpoint`

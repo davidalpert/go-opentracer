@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
@@ -182,9 +183,19 @@ func (o *RunOptions) Run() error {
 	}()
 	otel.SetTracerProvider(tp)
 
+	parentContext := context.Background()
+	if os.Getenv("W3CTRACEPARENT") != "" {
+		if o.Debug {
+			fmt.Printf("------------------------------------------------------------------------------------\n")
+			fmt.Printf("found trace parent: %s\n", os.Getenv("W3CTRACEPARENT"))
+		}
+		parentContext = propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}).Extract(parentContext, propagation.MapCarrier{
+			w3c.TraceparentHeader: os.Getenv("W3CTRACEPARENT"),
+		})
+	}
 	ctx, span := otel.Tracer(o.VersionSummary.AppName,
 		trace.WithInstrumentationVersion(o.VersionSummary.Version),
-	).Start(context.TODO(), o.SpanName)
+	).Start(parentContext, o.SpanName)
 	defer span.End()
 	cmdCtx := trace.ContextWithSpan(context.TODO(), span)
 
