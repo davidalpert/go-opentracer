@@ -31,6 +31,7 @@ import (
 type RunOptions struct {
 	utils.PrinterOptions
 	Command               string
+	CommandArgs           []string
 	Debug                 bool
 	DeploymentEnvironment string
 	ServiceName           string
@@ -54,9 +55,26 @@ func NewRunOptions() *RunOptions {
 func NewCmdRun() *cobra.Command {
 	o := NewRunOptions()
 	var cmd = &cobra.Command{
-		Use:   "run <cmd>",
-		Short: "runs a command inside an open trace and span",
-		Args:  cobra.ExactArgs(1),
+		Use:   "run <cmd> [optional args]",
+		Short: "Run a command inside an open trace and span",
+		Long: `Invoke a shell command inside an OpenTelemetry Span
+
+opentracer -e dev --span-name RunBackup --trace-http-endpoint $OTELCOL_OTLP_HTTP_ENDPOINT /opt/backup.sh $(date +%F) -- -xvf
+           |                                                                            | |                        |    |
+           [<---------- opentracer flags can come anywhere before the '--' ------------>] [<-- cmd (with args) --->]    [cmd flags go here]
+
+NOTE: flags before "--" are interpreted by opentracer; flags after "--" are passed into your shell command
+
+Features:
+- opentracer performs token replacement on the command text before executing it so the supported tokens can be used to make use of the trace context;
+- opentracer adds the same tokens as env variables so any script run inside the command should also be able to reference the trace context;
+- opentracer can create nested spans; if you use opentracer to run a command or script which includes another call to opentracer the inner span will detect the outer trace context and nest inside the parent span;
+- you can override the deployment.environment value (e.g. --deployment-environment dev or -e dev)
+- you can add arbitrary tags of the format --tag key:value and they will be added to the wrapping span as string values;
+- you can add typed spans by optionally specifying one of the supported types --tag key:value:type (e.g. --tag is_registered:true:bool)
+- you can send traces to any OpenTelemetry collector configured with an OTLP HTTP endpoint using --trace-http-endpoint or to an OpenTelemetry log file using --trace-log-file
+`,
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := o.Complete(cmd, args); err != nil {
 				return err
@@ -88,6 +106,7 @@ func NewCmdRun() *cobra.Command {
 // Complete completes the RunOptions
 func (o *RunOptions) Complete(cmd *cobra.Command, args []string) error {
 	o.Command = args[0]
+	o.CommandArgs = args[1:]
 	return nil
 }
 
@@ -207,13 +226,15 @@ func (o *RunOptions) Run() error {
 		}
 	}
 
-	cmdText := injectTraceAndSpanID(cmdCtx, o.Command)
-	//cmdText = os.ExpandEnv(cmdText) // TODO: review as this may create unpredictable behavior
-	cmdParts := strings.Split(cmdText, " ")
-	c := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
+	o.Command = injectTraceAndSpanID(cmdCtx, o.Command)
+	for i, s := range o.CommandArgs {
+		o.CommandArgs[i] = injectTraceAndSpanID(cmdCtx, s)
+	}
+	c := exec.CommandContext(ctx, o.Command, o.CommandArgs...)
 	c.Stdout = os.Stdout
 	c.Stdin = os.Stdin
 	c.Stderr = os.Stderr
+	// copy parent env vars so that they are available to the child process
 	c.Env = make([]string, len(os.Environ()))
 	for i, e := range os.Environ() {
 		c.Env[i] = e
