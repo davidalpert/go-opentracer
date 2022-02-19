@@ -57,13 +57,17 @@ xbuild: gen ## xbuild
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=$(CGO) $(GO) build -o bin/darwin-amd64/$(PROJECT_NAME) ./main.go
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=$(CGO) $(GO) build -o bin/darwin-arm64/$(PROJECT_NAME) ./main.go
 
-ship:
+# output dir for shipping into docker for integration testing
+SHIP_BIN := $(shell pwd)/bin/linux-amd64/$(PROJECT_NAME)
+
+ship: gen ## build and copy into a local docker container for integration testing
 	@echo "Building $(PROJECT_NAME) $(VERSION) for linux/amd64"
 	mkdir -p bin
-	@CGO_ENABLED=$(CGO) GOOS=linux GOARCH=amd64 $(GO) build -o bin/linux-amd64/$(PROJECT_NAME) ./main.go
+
+	@CGO_ENABLED=$(CGO) GOOS=linux GOARCH=amd64 $(GO) build -o $(SHIP_BIN) ./main.go
 	@echo "Copying $(PROJECT_NAME) $(VERSION) into the container"
-	docker cp "$(HOME)/dev/personal/go-opentracer/bin/linux-amd64/$(PROJECT_NAME)" "$(shell docker ps | grep otel | awk '{print $$1}'):/$(PROJECT_NAME)"
-	#docker cp "$(HOME)/dev/personal/go-opentracer/bin/linux-amd64/$(PROJECT_NAME)" "$(shell docker ps | grep default-centos-7 | awk '{print $$1}'):/$(PROJECT_NAME)"
+	docker cp "$(SHIP_BIN)" "$(shell docker ps | grep otel | awk '{print $$1}'):/$(PROJECT_NAME)"
+	#docker cp "$(SHIP_BIN)" "$(shell docker ps | grep default-centos-7 | awk '{print $$1}'):/$(PROJECT_NAME)"
 
 rebuild: clean build ## rebuild
 
