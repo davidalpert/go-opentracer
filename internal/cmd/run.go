@@ -30,6 +30,7 @@ import (
 type RunOptions struct {
 	utils.PrinterOptions
 	Command               string
+	Debug                 bool
 	DeploymentEnvironment string
 	ServiceName           string
 	ServiceVersion        string
@@ -79,6 +80,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&o.SpanName, "span-name", "Run", "name for this span")
 	cmd.Flags().StringVar(&o.ServiceName, "service", o.VersionSummary.AppName, "value for this span's service tag")
 	cmd.Flags().StringVar(&o.ServiceVersion, "service-version", o.VersionSummary.Version, "value for this span's service version tag")
+	cmd.Flags().BoolVar(&o.Debug, "debug", false, "debug :WARNING: this can dump secrets to the command line")
 	return cmd
 }
 
@@ -207,6 +209,11 @@ func (o *RunOptions) Run() error {
 	}
 	c.Env = appendTraceAndSpanIDToEnv(ctx, c.Env)
 
+	if o.Debug {
+		fmt.Printf("------------------------------------------------------------------------------------\n")
+		fmt.Printf("opentracer running: %s %s\n", c.Path, strings.Join(c.Args[1:], " "))
+		fmt.Printf("------------------------------------------------------------------------------------\n")
+	}
 	err := c.Run()
 	if err != nil {
 		span.RecordError(err)
