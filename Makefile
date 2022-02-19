@@ -82,7 +82,7 @@ changelog: ## Generate/update CHANGELOG.md
 
 eq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 
-release:
+release: test
 	$(if $(call eq,0,$(shell git diff-files --quiet; echo $$?)),, \
 		$(error There are unstaged changes; clean your working directory before releasing.) \
 	)
