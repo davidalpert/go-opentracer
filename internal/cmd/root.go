@@ -41,9 +41,14 @@ func NewRootCmd() *cobra.Command {
 // NewDefaultRootCommandWithArgs creates the root command with explicit arguments (exposing a seam decoupled from the environment)
 func NewDefaultRootCommandWithArgs(args []string, in io.Reader, out, errout io.Writer) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use: "gopentracer",
+		Use: "opentracer",
 		//Aliases:       []string{},
-		Short:         "gopentracer executes a shell command in an open trace",
+		Short: "opentracer executes a shell command in an open trace",
+		CompletionOptions: cobra.CompletionOptions{
+			DisableDefaultCmd:   true,
+			DisableNoDescFlag:   false,
+			DisableDescriptions: false,
+		},
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		// Uncomment the following line if your bare application

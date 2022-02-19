@@ -116,7 +116,6 @@ Usage:
   gopentracer [command]
 
 Available Commands:
-  completion  generate the autocompletion script for the specified shell
   help        Help about any command
   run         runs a command inside an open trace and span
   version     Show version information
