@@ -161,9 +161,14 @@ Then:
     make test
     ```
    
-4. Build the tool
+4. Build the tool for your OS/ARCH
     ```sh
     make build
+    ```
+   
+5. Run the tool locally
+    ```sh
+    bin/opentracer
     ```
 
 ### Make targets
