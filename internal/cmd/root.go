@@ -15,7 +15,7 @@
 package cmd
 
 import (
-	"github.com/davidalpert/gopentracer/internal/utils"
+	"github.com/davidalpert/opentracer/internal/utils"
 	"io"
 	"os"
 

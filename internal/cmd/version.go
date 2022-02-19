@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/davidalpert/gopentracer/internal/utils"
-	"github.com/davidalpert/gopentracer/internal/version"
+	"github.com/davidalpert/opentracer/internal/utils"
+	"github.com/davidalpert/opentracer/internal/version"
 	"github.com/spf13/cobra"
 )
 

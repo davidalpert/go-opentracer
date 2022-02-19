@@ -3,11 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/davidalpert/gopentracer/internal/datadog"
-	"github.com/davidalpert/gopentracer/internal/types"
-	"github.com/davidalpert/gopentracer/internal/utils"
-	"github.com/davidalpert/gopentracer/internal/version"
-	"github.com/davidalpert/gopentracer/internal/w3c"
+	"github.com/davidalpert/opentracer/internal/datadog"
+	"github.com/davidalpert/opentracer/internal/types"
+	"github.com/davidalpert/opentracer/internal/utils"
+	"github.com/davidalpert/opentracer/internal/version"
+	"github.com/davidalpert/opentracer/internal/w3c"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -312,7 +312,7 @@ func appendTraceAndSpanIDToEnv(ctx context.Context, ss []string) []string {
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_TRACE_ID=$DD_TRACE_ID"))
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_SPAN_ID=$DD_SPAN_ID"))
 	ss = append(ss, injectTraceAndSpanID(ctx, "W3CTRACEPARENT=$W3CTRACEPARENT"))
-	ss = append(ss, fmt.Sprintf("GOPENTRACER_VERSION=%s", version.Summary.Version))
+	ss = append(ss, fmt.Sprintf("OPENTRACER_VERSION=%s", version.Summary.Version))
 	return ss
 }
 

@@ -1,4 +1,4 @@
-module github.com/davidalpert/gopentracer
+module github.com/davidalpert/opentracer
 
 go 1.17
 

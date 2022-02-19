@@ -123,10 +123,10 @@ The `opentracer` binary also ships with a number of utility commands which you c
 
 ```
 $> bin/opentracer
-gopentracer executes a shell command in an open trace
+opentracer executes a shell command in an open trace
 
 Usage:
-  gopentracer [command]
+  opentracer [command]
 
 Available Commands:
   help        Help about any command
@@ -134,9 +134,9 @@ Available Commands:
   version     Show version information
 
 Flags:
-  -h, --help   help for gopentracer
+  -h, --help   help for opentracer
 
-Use "gopentracer [command] --help" for more information about a command.
+Use "opentracer [command] --help" for more information about a command.
 ```
 
 <!-- ROADMAP -->

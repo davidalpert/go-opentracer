@@ -4,7 +4,7 @@ package main
 
 import (
 	_ "embed"
-	"github.com/davidalpert/gopentracer/internal/cmd"
+	"github.com/davidalpert/opentracer/internal/cmd"
 )
 
 func main() {
