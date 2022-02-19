@@ -19,6 +19,10 @@ VERSION=$(shell sbot get version)
 .PHONY: default
 default: help
 
+.PHONY: doctor
+doctor: ## validate that you are set up for local development
+	./tools/doctor.sh
+
 .PHONY: clean
 clean:
 	rm -rf ./bin
