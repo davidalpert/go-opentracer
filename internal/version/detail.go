@@ -101,11 +101,11 @@ type DetailStruct struct {
 }
 
 // String implements Stringer
-func (d *DetailStruct) String() string {
-	if d == nil {
+func (s *DetailStruct) String() string {
+	if s == nil {
 		return "n/a"
 	}
-	return fmt.Sprintf("%s %s", d.AppName, d.Version)
+	return fmt.Sprintf("%s %s", s.AppName, s.Version)
 }
 
 // ToUserAgentString formats a DetailStruct as a User-Agent string
@@ -123,7 +123,7 @@ func (s DetailStruct) ToUserAgentString() string {
 		}
 	}
 
-	detailParts := []string{}
+	detailParts := make([]string, 0)
 	for k, v := range productDetails {
 		detailParts = append(detailParts, fmt.Sprintf("%s: %s", k, v))
 	}

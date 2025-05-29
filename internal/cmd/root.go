@@ -15,8 +15,8 @@
 package cmd
 
 import (
+	"github.com/davidalpert/go-printers/v1"
 	"github.com/davidalpert/opentracer/internal/utils"
-	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -24,7 +24,9 @@ import (
 
 // Execute builds the default root command and invokes it with os.Args
 func Execute() {
-	rootCmd := NewRootCmd()
+	s := printers.DefaultOSStreams()
+
+	rootCmd := NewRootCmd(s)
 
 	rootCmd.SetArgs(os.Args[1:]) // without program
 
@@ -34,12 +36,7 @@ func Execute() {
 }
 
 // NewRootCmd creates the root command with default arguments
-func NewRootCmd() *cobra.Command {
-	return NewDefaultRootCommandWithArgs(os.Args, os.Stdin, os.Stdout, os.Stderr)
-}
-
-// NewDefaultRootCommandWithArgs creates the root command with explicit arguments (exposing a seam decoupled from the environment)
-func NewDefaultRootCommandWithArgs(args []string, in io.Reader, out, errout io.Writer) *cobra.Command {
+func NewRootCmd(s printers.IOStreams) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use: "opentracer",
 		//Aliases:       []string{},
@@ -65,8 +62,8 @@ func NewDefaultRootCommandWithArgs(args []string, in io.Reader, out, errout io.W
 	// when this action is called directly.
 	//bindLocalFlags(rootCmd)
 
-	rootCmd.AddCommand(NewCmdRun())
-	rootCmd.AddCommand(NewCmdVersion())
+	rootCmd.AddCommand(NewCmdRun(s))
+	rootCmd.AddCommand(NewCmdVersion(s))
 
 	return rootCmd
 }

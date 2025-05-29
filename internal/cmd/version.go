@@ -1,28 +1,28 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/davidalpert/opentracer/internal/utils"
+	"github.com/davidalpert/go-printers/v1"
 	"github.com/davidalpert/opentracer/internal/version"
 	"github.com/spf13/cobra"
 )
 
 // VersionOptions is a struct to support version command
 type VersionOptions struct {
-	utils.PrinterOptions
-	VersionDetail version.DetailStruct
+	*printers.PrinterOptions
+	VersionDetail *version.DetailStruct
 }
 
 // NewVersionOptions returns initialized VersionOptions
-func NewVersionOptions() *VersionOptions {
+func NewVersionOptions(s printers.IOStreams) *VersionOptions {
 	return &VersionOptions{
-		VersionDetail: version.Detail,
+		PrinterOptions: printers.NewPrinterOptions().WithStreams(s).WithDefaultOutput("text"),
+		VersionDetail:  &version.Detail,
 	}
 }
 
 // NewCmdVersion creates the version command
-func NewCmdVersion() *cobra.Command {
-	o := NewVersionOptions()
+func NewCmdVersion(s printers.IOStreams) *cobra.Command {
+	o := NewVersionOptions(s)
 	var cmd = &cobra.Command{
 		Use:   "version",
 		Short: "Show version information",
@@ -42,7 +42,7 @@ func NewCmdVersion() *cobra.Command {
 		},
 	}
 
-	o.AddPrinterFlags(cmd)
+	o.AddPrinterFlags(cmd.Flags())
 
 	return cmd
 }
@@ -59,11 +59,5 @@ func (o *VersionOptions) Validate() error {
 
 // Run executes the command
 func (o *VersionOptions) Run() error {
-	if s, _, err := o.PrinterOptions.FormatOutput(o.VersionDetail); err != nil {
-		return err
-	} else {
-		fmt.Println(s)
-	}
-
-	return nil
+	return o.WriteOutput(o.VersionDetail)
 }

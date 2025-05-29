@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/davidalpert/go-printers/v1"
 	"github.com/davidalpert/opentracer/internal/datadog"
 	"github.com/davidalpert/opentracer/internal/types"
-	"github.com/davidalpert/opentracer/internal/utils"
 	"github.com/davidalpert/opentracer/internal/version"
 	"github.com/davidalpert/opentracer/internal/w3c"
 	"github.com/spf13/cobra"
@@ -29,7 +29,7 @@ import (
 
 // RunOptions is a struct to support version command
 type RunOptions struct {
-	utils.PrinterOptions
+	*printers.PrinterOptions
 	Command               string
 	CommandArgs           []string
 	Debug                 bool
@@ -45,15 +45,16 @@ type RunOptions struct {
 }
 
 // NewRunOptions returns initialized RunOptions
-func NewRunOptions() *RunOptions {
+func NewRunOptions(s printers.IOStreams) *RunOptions {
 	return &RunOptions{
-		VersionDetail: version.Detail,
+		PrinterOptions: printers.NewPrinterOptions().WithStreams(s).WithDefaultOutput("text"),
+		VersionDetail:  version.Detail,
 	}
 }
 
 // NewCmdRun creates the version command
-func NewCmdRun() *cobra.Command {
-	o := NewRunOptions()
+func NewCmdRun(s printers.IOStreams) *cobra.Command {
+	o := NewRunOptions(s)
 	var cmd = &cobra.Command{
 		Use:   "run <cmd> [optional args]",
 		Short: "Run a command inside an open trace and span",
@@ -90,7 +91,7 @@ Features:
 		},
 	}
 
-	o.AddPrinterFlags(cmd)
+	o.AddPrinterFlags(cmd.Flags())
 	cmd.Flags().StringVarP(&o.DeploymentEnvironment, "deployment-environment", "e", "prd", "deployment environment")
 	cmd.Flags().StringVar(&o.TraceOLTPHttpEndpoint, "trace-http-endpoint", "", "sent traces over http to this endpoint")
 	cmd.Flags().StringVar(&o.TraceLogFile, "trace-log-file", "", "log traces to this file")
