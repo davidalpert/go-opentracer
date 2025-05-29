@@ -10,13 +10,13 @@ import (
 // VersionOptions is a struct to support version command
 type VersionOptions struct {
 	utils.PrinterOptions
-	VersionSummary version.SummaryStruct
+	VersionDetail version.DetailStruct
 }
 
 // NewVersionOptions returns initialized VersionOptions
 func NewVersionOptions() *VersionOptions {
 	return &VersionOptions{
-		VersionSummary: version.Summary,
+		VersionDetail: version.Detail,
 	}
 }
 
@@ -27,7 +27,7 @@ func NewCmdVersion() *cobra.Command {
 		Use:   "version",
 		Short: "Show version information",
 		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string)error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := o.Complete(cmd, args); err != nil {
 				return err
 			}
@@ -59,7 +59,7 @@ func (o *VersionOptions) Validate() error {
 
 // Run executes the command
 func (o *VersionOptions) Run() error {
-	if s, _, err := o.PrinterOptions.FormatOutput(version.Summary); err != nil {
+	if s, _, err := o.PrinterOptions.FormatOutput(o.VersionDetail); err != nil {
 		return err
 	} else {
 		fmt.Println(s)

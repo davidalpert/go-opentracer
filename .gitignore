@@ -7,7 +7,6 @@
 
 # build output
 bin/
-internal/version/detail.go
 *.received.txt
 
 # render output

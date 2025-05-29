@@ -41,13 +41,13 @@ type RunOptions struct {
 	TraceOLTPHttpEndpoint string
 	TraceLogFile          string
 	SpanDelay             time.Duration
-	VersionSummary        version.SummaryStruct
+	VersionDetail         version.DetailStruct
 }
 
 // NewRunOptions returns initialized RunOptions
 func NewRunOptions() *RunOptions {
 	return &RunOptions{
-		VersionSummary: version.Summary,
+		VersionDetail: version.Detail,
 	}
 }
 
@@ -97,8 +97,8 @@ Features:
 	cmd.Flags().StringSliceVar(&o.SpanTagsRaw, "tag", make([]string, 0), "tags in the format key:val[:type]")
 	cmd.Flags().DurationVar(&o.SpanDelay, "span-delay", 100*time.Millisecond, "how long to wait after the command completes before completing the span (golang time.Duration)")
 	cmd.Flags().StringVar(&o.SpanName, "span-name", "Run", "name for this span")
-	cmd.Flags().StringVar(&o.ServiceName, "service", o.VersionSummary.AppName, "value for this span's service tag")
-	cmd.Flags().StringVar(&o.ServiceVersion, "service-version", o.VersionSummary.Version, "value for this span's service version tag")
+	cmd.Flags().StringVar(&o.ServiceName, "service", o.VersionDetail.AppName, "value for this span's service tag")
+	cmd.Flags().StringVar(&o.ServiceVersion, "service-version", o.VersionDetail.Version, "value for this span's service version tag")
 	cmd.Flags().BoolVar(&o.Debug, "debug", false, "debug :WARNING: this can dump secrets to the command line")
 	return cmd
 }
@@ -212,8 +212,8 @@ func (o *RunOptions) Run() error {
 			w3c.TraceparentHeader: os.Getenv("W3CTRACEPARENT"),
 		})
 	}
-	ctx, span := otel.Tracer(o.VersionSummary.AppName,
-		trace.WithInstrumentationVersion(o.VersionSummary.Version),
+	ctx, span := otel.Tracer(o.VersionDetail.AppName,
+		trace.WithInstrumentationVersion(o.VersionDetail.Version),
 	).Start(parentContext, o.SpanName)
 	defer span.End()
 	cmdCtx := trace.ContextWithSpan(context.TODO(), span)
@@ -312,7 +312,7 @@ func appendTraceAndSpanIDToEnv(ctx context.Context, ss []string) []string {
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_TRACE_ID=$DD_TRACE_ID"))
 	ss = append(ss, injectTraceAndSpanID(ctx, "DD_SPAN_ID=$DD_SPAN_ID"))
 	ss = append(ss, injectTraceAndSpanID(ctx, "W3CTRACEPARENT=$W3CTRACEPARENT"))
-	ss = append(ss, fmt.Sprintf("OPENTRACER_VERSION=%s", version.Summary.Version))
+	ss = append(ss, fmt.Sprintf("OPENTRACER_VERSION=%s", version.Detail.Version))
 	return ss
 }
 

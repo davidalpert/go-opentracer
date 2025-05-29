@@ -1,0 +1,16 @@
+(ASDF|asdf)
+(Datadog|datadog)
+(Golang|golang|Go|go)
+(Make|make)
+(OpenTracer|opentracer)
+OTLP
+(Task|task)
+aruba
+asdf
+Github
+GPL
+Idele
+Kotze
+hexidecimal
+url
+Zsh

@@ -1,6 +1,6 @@
 module github.com/davidalpert/opentracer
 
-go 1.17
+go 1.23.8
 
 require (
 	github.com/kr/pretty v0.2.0 // indirect

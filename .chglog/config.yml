@@ -12,11 +12,31 @@ options:
     #     - perf
     #     - refactor
   commit_groups:
-    # title_maps:
-    #   feat: Features
-    #   fix: Bug Fixes
-    #   perf: Performance Improvements
-    #   refactor: Code Refactoring
+    title_maps:
+      feat: Added        # for new features.
+      chg: Changed       # for changes in existing functionality.
+      dep: Deprecated    # for soon-to-be removed features.
+      doc: Documentation # for documentation updates.
+      rem: Removed       # for now removed features.
+      fix: Fixed         # for any bug fixes.
+      sec: Security      # in case of vulnerabilities.
+      perf: Performance  # for performance improvements.
+      build: Build       # for build changes.
+      refactor: Code Refactoring
+      test: Test Coverage
+    sort_by: Custom
+    title_order:
+      - feat
+      - chg
+      - dep
+      - rem
+      - fix
+      - sec
+      - perf
+      - test
+      - doc
+      - build
+      - refactor
   header:
     pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
     pattern_maps:

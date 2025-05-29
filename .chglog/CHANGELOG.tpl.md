@@ -14,11 +14,13 @@
 <h1 align="center">OpenTracer</h1>
 
 <p align="center">
-  OpenTracer is a CLI tool for wrapping shell scripts and shell commands inside an OpenTelemetry Trace and Span.
+  A command-line tool to wrap shell scripts and shell commands inside an OpenTelemetry Trace and Span.
   <br />
   <a href="./README.md">README</a>
   ·
-  <a href="./CHANGELOG.md"><string>CHANGELOG</string></a>
+  <a href="./CHANGELOG.md"><strong>CHANGELOG</strong></a>
+  .
+  <a href="./CONTRIBUTING.md">CONTRIBUTING</a>
   <br />
   <a href="https://github.com/davidalpert/go-opentracer/issues">Report Bug</a>
   ·
