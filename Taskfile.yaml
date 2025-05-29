@@ -144,12 +144,11 @@ tasks:
       - git-chglog --output RELEASE_NOTES.md --template .chglog/RELEASE_NOTES.tpl.md "v{{ .VERSION }}"
 
   release:
-    deps:
-      - test
     cmds:
       - task: gen
         vars:
           NEXT_VERSION: "{{ .NEXT_VERSION }}"
+      - task: test # do not run as a dependency so we don't update the version files and make a clean repo dirty
       - git-chglog --next-tag v{{ .NEXT_VERSION }} --output CHANGELOG.md
       - git add -f CHANGELOG.md
       - git add -f internal/version
