@@ -67,13 +67,45 @@ opentracer -e dev --span-name RunBackup --trace-http-endpoint $OTELCOL_OTLP_HTTP
 NOTE: flags before "--" are interpreted by opentracer; flags after "--" are passed into your shell command
 
 Features:
-- opentracer performs token replacement on the command text before executing it so the supported tokens can be used to make use of the trace context;
-- opentracer adds the same tokens as env variables so any script run inside the command should also be able to reference the trace context;
-- opentracer can create nested spans; if you use opentracer to run a command or script which includes another call to opentracer the inner span will detect the outer trace context and nest inside the parent span;
-- you can override the deployment.environment value (e.g. --deployment-environment dev or -e dev)
-- you can add arbitrary tags of the format --tag key:value and they will be added to the wrapping span as string values;
-- you can add typed spans by optionally specifying one of the supported types --tag key:value:type (e.g. --tag is_registered:true:bool)
+- opentracer performs token replacement on the command text before executing it;
+- opentracer adds the same tokens as environment variables so any script run inside the command can also reference the trace context;
+- opentracer automatically creates nested spans; if you use opentracer to run a command or script which includes another call to opentracer the trace context propagates through environment variables
+- override the deployment.environment value
+  - for example: --deployment-environment dev or -e dev
+- add arbitrary tags with the format --tag key:value and opentracer adds them to the wrapping span as string values;
+  - for example: --tag client:my_company
+- add typed spans by optionally specifying one of the supported types --tag key:value:type
+  - for example: --tag is_registered:true:bool
 - you can send traces to any OpenTelemetry collector configured with an OTLP HTTP endpoint using --trace-http-endpoint or to an OpenTelemetry log file using --trace-log-file
+
+Supported replacement tokens
+
+| Token          | Example                                                 |  Description                                                                           |
+| -------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| TRACE_ID       | 4bf92f3577b34da6a3ce929d0e0e4736                        | An OpenTelemetry-formatted 128-bit hexidecimal value                                   |
+| SPAN_ID        | 00f067aa0ba902b7                                        | An OpenTelemetry-formatted 64-bit hexidecimal value                                    |
+| W3CTRACEPARENT | 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01 | Trace context formatted for W3C standard: https://w3c.github.io/trace-context/         |
+| DD_TRACE_ID    | 9856658736241331422                                     | TRACE_ID as 64-bit unsigned integer matching Datadog's X-DATADOG-TRACE-ID HTTP header  | 
+| DD_SPAN_ID     | 1930319880373503199                                     | SPAN_ID  as 64-bit unsigned integer matching Datadog's X-DATADOG-PARENT-ID HTTP header | 
+
+To send the trace context downstream to an OpenTelemetry-instrumented service set the traceparent HTTP header which encodes the trace ID and parent span ID:
+
+---
+./opentracer --tag c:false -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H traceparent:$W3CTRACEPARENT https://your.opentelemetry-instrumented.service.com/info'
+---
+
+If you want more fine-grained control over the traceparent header which conforms to the W3C [trace-context](https://w3c.github.io/trace-context/) spec use the individual TRACE_ID and SPAN_ID variables:
+
+---
+./opentracer --tag c:false -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H traceparent:00-$TRACE_ID-$SPAN_ID-00 https://your.opentelemetry-instrumented.service.com/info'
+---
+
+Datadog uses a proprietary format for trace and parent IDs. If you want to propagate trace context to a datadog-instrumented service appropriately formatted DD_TRACE_ID and DD_SPAN_ID tokens also available:
+
+---
+./opentracer --tag c:134:int -e dev --trace-http-endpoint localhost:9003 run '/usr/bin/curl -kv -H X-DATADOG-TRACE-ID:$DD_TRACE_ID -H X-DATADOG-PARENT-ID:$DD_SPAN_ID https://your.datadog-instrumented.service.com/info'
+---
+
 `,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

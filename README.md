@@ -75,8 +75,12 @@ To get a local copy up and running follow these simple steps.
 Invoke a shell command inside an OpenTelemetry Span
 
 ```sh
-opentracer -e dev --span-name RunBackup --trace-http-endpoint $OTELCOL_OTLP_HTTP_ENDPOINT /opt/backup.sh -- $(date +%F)
+opentracer -e dev --span-name RunBackup --trace-http-endpoint $OTELCOL_OTLP_HTTP_ENDPOINT /opt/backup.sh $(date +%F) -- -xvf
+|                                                                                       | |                        |    |
+[<---------- opentracer flags can come anywhere before the '--' ----------------------->] [<-- cmd (with args) --->]    [cmd flags go here]
 ```
+
+NOTE: flags before "--" are interpreted by opentracer; flags after "--" are passed into your shell command
 
 Features:
 - `opentracer` performs token replacement on the command text before executing it;
