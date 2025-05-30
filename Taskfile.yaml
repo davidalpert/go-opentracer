@@ -149,6 +149,7 @@ tasks:
         vars:
           NEXT_VERSION: "{{ .NEXT_VERSION }}"
       - task: test # do not run as a dependency so we don't update the version files and make a clean repo dirty
+      - 'echo "internal/version/_APPVERSION: $(cat internal/version/_APPVERSION.txt)"'
       - git-chglog --next-tag v{{ .NEXT_VERSION }} --output CHANGELOG.md
       - git add -f CHANGELOG.md
       - git add -f internal/version
@@ -156,7 +157,6 @@ tasks:
       - sbot release version --mode {{ .BUMP_TYPE }}
       - git show --no-patch --format=short v{{ .NEXT_VERSION }}
       - git diff --name-only HEAD~1
-      - 'echo "internal/version/_APPVERSION: $(cat internal/version/_APPVERSION.txt)"'
     preconditions:
       - sh: git diff-files --quiet
         msg: There are unstaged changes; clean your working directory before releasing.
