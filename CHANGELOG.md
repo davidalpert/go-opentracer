@@ -30,6 +30,13 @@
 ## Changelog
 
 
+<a name="v2.1.1"></a>
+### [v2.1.1] - 2025-05-30
+#### Documentation
+- improve detail in CLI help text
+#### Build
+- show the version we are building before we commit
+
 <a name="v2.1.0"></a>
 ### [v2.1.0] - 2025-05-29
 #### Added
@@ -107,7 +114,8 @@ existing run args should be reviewed and updated for compatibility with improved
 #### Added
 - **run:** add initial spike of a tracer
 
-[Unreleased]: https://github.com/davidalpert/go-opentracer/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/davidalpert/go-opentracer/compare/v2.1.1...HEAD
+[v2.1.1]: https://github.com/davidalpert/go-opentracer/compare/v2.1.0...v2.1.1
 [v2.1.0]: https://github.com/davidalpert/go-opentracer/compare/v2.0.0...v2.1.0
 [v2.0.0]: https://github.com/davidalpert/go-opentracer/compare/v1.1.1...v2.0.0
 [v1.1.1]: https://github.com/davidalpert/go-opentracer/compare/v1.1.0...v1.1.1
